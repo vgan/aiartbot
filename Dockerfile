@@ -1,4 +1,4 @@
-FROM vault.habana.ai/gaudi-docker/1.1.0/ubuntu18.04/habanalabs/tensorflow-installer-tf-cpu-2.6.0:1.1.0-614
+FROM vault.habana.ai/gaudi-docker/1.1.0/ubuntu18.04/habanalabs/pytorch-installer-1.9.1:1.1.0-614 
 RUN apt update
 RUN apt install -y git vim
 RUN git clone https://github.com/openai/CLIP
