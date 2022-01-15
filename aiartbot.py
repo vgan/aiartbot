@@ -25,7 +25,6 @@
 # This script contains large portions of code originally created by Sebastián Bórquez
 
 import os, random
-from textPromptGen import *
 from extra import *
 from subprocess import Popen, PIPE
 from datetime import datetime
@@ -300,10 +299,62 @@ def generate_images(
 
     image = str('/AWS_Deep_Learning_Challenge_2022/outputs/' + experiment_name + '/progress.png')
     text = to_text(prompts)
-    sendToInterwebs(image,text,model_name)
+    sendToInternet(image,text,model_name)
     return i
 
-def sendToInterwebs(image,text,model_name):
+def generateText():
+	credentials = {
+		"type": "service_account",
+		"project_id": os.environ['PROJECT_ID'],
+		"private_key_id": os.environ['PRIVATE_KEY_ID'],
+		"private_key": os.environ['PRIVATE_KEY'],
+		"client_email": os.environ['CLIENT_EMAIL'],
+		"client_id": os.environ['CLIENT_ID'],
+		"auth_uri": "https://accounts.google.com/o/oauth2/auth",
+		"token_uri": "https://oauth2.googleapis.com/token",
+		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+		"client_x509_cert_url": os.environ['CLIENT_CERT_URL']
+	}
+	gc = gspread.service_account_from_dict(credentials)
+	gsheet = gc.open_by_url("https://docs.google.com/spreadsheets/d/1dT80A0WfWljJHX3RfenKVrcRowBl7ZHy6dV8VO1Wm44/")
+	wsheet = gsheet.worksheet("prompts")
+	places_col = 1
+    scenes_col = 2
+   	subjects_col = 3 
+  	styles_col = 4
+    modifiers_col = 5
+    presets_col = 6
+    override_col = 7
+    # [1:] slices/ removes the first (header) value from list
+    presets = wsheet.col_values(presets_col)[1:] 
+    preset = random.choice(presets)
+    scenes = wsheet.col_values(scenes_col)[1:]
+    scene = random.choice(scenes)
+    subjects = wsheet.col_values(subjects_col)[1:]
+    subject = random.choice(subjects)
+    subject2 = random.choice(subjects)
+    while subject == subject2:
+       	subject2 = random.choice(subjects)
+    styles = wsheet.col_values(styles_col)[1:]
+    style = random.choice(styles)
+    modifiers = wsheet.col_values(modifiers_col)[1:]
+    modifier = random.choice(modifiers)
+    places = wsheet.col_values(places_col)[1:]
+    place = random.choice(places)
+    templates = [subject + " and " + subject2 + " " + scene + " in the style of " + style, place + " in the style of " + style, subject + " and " + subject2 + " " + scene + " in the style of " + style + modifier, preset, subject + " " + scene + " in the style of " + style, place + " in the style of " + style, subject + " " + scene + " in the style of " + style + modifier , place + " in the style of " + style + modifier]
+    template = random.choice(templates)
+    try:
+       	override = wsheet.col_values(override_col)[1]
+       	if len(override) != 0:
+           	print("override active! value is: " + override)
+           	wsheet.update('G2',"")
+           	text = [override]
+    except:
+       	print(template)
+       	text = [template]
+    return text
+
+def sendToInternet(image,text,model_name):
     # set keys from env variables
     client_key = os.environ['CLIENT_KEY']
     client_secret = os.environ['CLIENT_SECRET']
