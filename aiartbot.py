@@ -334,8 +334,6 @@ def generateText():
     override_col = 6
     models_col = 7
     # [1:] slices/ removes the first (header) value from list
-    presets = wsheet.col_values(presets_col)[1:] 
-    preset = random.choice(presets)
     scenes = wsheet.col_values(scenes_col)[1:]
     scene = random.choice(scenes)
     subjects = wsheet.col_values(subjects_col)[1:]
