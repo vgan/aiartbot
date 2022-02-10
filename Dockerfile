@@ -1,15 +1,13 @@
-FROM vault.habana.ai/gaudi-docker/1.1.0/ubuntu18.04/habanalabs/pytorch-installer-1.9.1:1.1.0-614 
+FROM tensorflow/tensorflow:latest-gpu-jupyter
 RUN apt update
-RUN apt install -y git vim
+RUN apt install -y git vim curl
 RUN git clone https://github.com/openai/CLIP
 RUN git clone https://github.com/CompVis/taming-transformers
-RUN git clone https://github.com/vgan/AWS_Deep_Learning_Challenge_2022.git
-RUN pip install torch==1.9.0+cpu torchvision==0.10.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+RUN git clone https://github.com/vgan/aiartbot.git
+RUN pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip install ftfy regex tqdm omegaconf pytorch-lightning tweepy Mastodon.py imageio pandas seaborn kornia einops==0.3.0 transformers==4.3.1 gspread oauth2client
-RUN chmod u+x AWS_Deep_Learning_Challenge_2022/aiartbot.py
+RUN chmod u+x aiartbot/aiartbot.py
 RUN mkdir -p "/root/.cache/torch/hub/checkpoints"
 RUN curl "https://download.pytorch.org/models/vgg16-397923af.pth" -o "/root/.cache/torch/hub/checkpoints/vgg16-397923af.pth"
-RUN ln -s /mnt/AWS_Deep_Learning_Challenge_2022/models /AWS_Deep_Learning_Challenge_2022/
-RUN ln -s /mnt/AWS_Deep_Learning_Challenge_2022/outputs /AWS_Deep_Learning_Challenge_2022/
-WORKDIR "/AWS_Deep_Learning_Challenge_2022/"
+WORKDIR "/tf/aiartbot"
 ADD VERSION .

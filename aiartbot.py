@@ -194,7 +194,7 @@ def to_text(prompts):
         .replace(" |", ", ")
 
 def generate_images(
-        prompts, model, outputs_folder, models_folder, iterations=150, image_prompts=[], 
+        prompts, model, outputs_folder, models_folder, iterations=200, image_prompts=[], 
         noise_prompt_seeds=[], noise_prompt_weights=[], size=[640, 480],
         init_image=None, init_weight=0., clip_model='ViT-B/32', 
         step_size=0.1, cutn=64, cut_pow=1., display_freq=5, seed=None,
@@ -297,7 +297,7 @@ def generate_images(
     except KeyboardInterrupt:
         print("Aborted")
 
-    image = str('/AWS_Deep_Learning_Challenge_2022/outputs/' + experiment_name + '/progress.png')
+    image = str('/tf/aiartbot/outputs/' + experiment_name + '/progress.png')
     text = to_text(prompts)
     sendToInternet(image,text,model_name)
     return i
@@ -331,8 +331,8 @@ def generateText():
     subjects_col = 3 
     styles_col = 4
     modifiers_col = 5
-    presets_col = 6
-    override_col = 7
+    override_col = 6
+    models_col = 7
     # [1:] slices/ removes the first (header) value from list
     presets = wsheet.col_values(presets_col)[1:] 
     preset = random.choice(presets)
@@ -349,7 +349,12 @@ def generateText():
     modifier = random.choice(modifiers)
     places = wsheet.col_values(places_col)[1:]
     place = random.choice(places)
-    templates = [subject + " and " + subject2 + " " + scene + " in the style of " + style, place + " in the style of " + style, subject + " and " + subject2 + " " + scene + " in the style of " + style + modifier, preset, subject + " " + scene + " in the style of " + style, place + " in the style of " + style, subject + " " + scene + " in the style of " + style + modifier , place + " in the style of " + style + modifier]
+    model = wsheet.col_values(models_col)[1]
+    if model == 'random':
+        model_name = random.choice(['vqgan_imagenet_f16_16384','sflckr','coco','wikiart'])
+    else:
+        model_name = model
+    templates = [subject + " and " + subject2 + " " + scene + " in the style of " + style, place + " in the style of " + style, subject + " and " + subject2 + " " + scene + " in the style of " + style + modifier, subject + " " + scene + " in the style of " + style, place + " in the style of " + style, subject + " " + scene + " in the style of " + style + modifier , place + " in the style of " + style + modifier]
     template = random.choice(templates)
     try:
         override = wsheet.col_values(override_col)[1]
@@ -360,7 +365,7 @@ def generateText():
     except:
         print(template)
         text = [template]
-    return text
+    return (text,model)
 
 def sendToInternet(image,text,model_name):
     # set keys from env variables
@@ -391,14 +396,15 @@ def sendToInternet(image,text,model_name):
     imageObj = open(image)
     upload = api.media_upload(filename=image)
     media_ids = [upload.media_id_string]
-    tweet = '"' + text + '"' + "\nModel: " + model_name
+    tweet = '"' + text + '"' + "\nModel: " + model_name + "\n"
+    tweet = tweet + random.choice(["","","","","","","","","","#vqganclip","#aiart","#vqgan","#generative","#generativeart","","",""])
     result = api.update_status(media_ids=media_ids, status=tweet)
 
 def main():
-    prompts = generateText()
-    model_name = random.choice(['vqgan_imagenet_f16_16384','sflckr','coco','wikiart'])
-    models_folder = "/AWS_Deep_Learning_Challenge_2022/models"
-    outputs_folder = "/AWS_Deep_Learning_Challenge_2022/outputs"
+    generated = generateText()
+    prompts = generated[0]
+    model_name = generated[1]
+    models_folder = "/tf/aiartbot/models"
+    outputs_folder = "/tf/aiartbot/outputs"
     generate_images(prompts=prompts,model=model_name,outputs_folder=outputs_folder,models_folder=models_folder)
-
 main()
