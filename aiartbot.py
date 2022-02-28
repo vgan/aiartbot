@@ -383,7 +383,7 @@ def sendToInternet(image,text,model_name):
     media_dict = mastodon.media_post(image,"image/png",description)
     
     if "Giger" in text:
-        mastodon.status_post(spoiler_text="H.R. Giger related image prompt",status=text, media_ids=[media_dict,], sensitive=False)
+        mastodon.status_post(spoiler_text="H.R. Giger related image prompt", status=toot_text, media_ids=[media_dict,], sensitive=False)
     else:
         mastodon.status_post(status=toot_text, media_ids=[media_dict,], sensitive=False)
     # Twitter
