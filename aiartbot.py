@@ -358,7 +358,7 @@ def generateText():
         override = wsheet.col_values(override_col)[1]
         if len(override) != 0:
                 print("override active! value is: " + override)
-                wsheet.update('G2',"")
+                wsheet.update('F2',"")
                 text = [override]
     except:
         print(template)
@@ -382,7 +382,7 @@ def sendToInternet(image,text,model_name):
     description = text + "\nModel: " + model_name
     media_dict = mastodon.media_post(image,"image/png",description)
     
-    if "H.R. Giger" in text:
+    if "Giger" in text:
         mastodon.status_post(spoiler_text="H.R. Giger related image prompt",status=text, sensitive=False)
     else:
         mastodon.status_post(status=toot_text, media_ids=[media_dict,], sensitive=False)
